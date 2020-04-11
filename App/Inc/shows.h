@@ -1,196 +1,101 @@
+/**
+  ******************************************************************************
+  * @file           : shows.h
+  * @brief          : header file of shows system
+  ******************************************************************************
+  *
+  ******************************************************************************
+  */
+
 #ifndef _SHOWS_H
 #define _SHOWS_H
 
 /* =========================================================================================== */
-/* ==  DEFINES == */
+/*   DEFINES AND ENUMERATORS                                                                   */
 /* =========================================================================================== */
+typedef enum _show_mode
+{
+    SHOW_MODE_FRAME_BY_FRAME,
+    SHOW_MODE_RUNNING_IMAGE,
+} show_mode_e;
 
-//#define TRUE  (1)
-//#define FALSE (0)
-//
-//#define REGULAR_DIRECTION (0) //From LED #0 to end of strip
-//#define REVERSE_DIRECTION (1) //From end of strip to LED #0
-//#define ALTER_DIRECTION   (2)
-//#define NUM_OF_SHOWS      (5)
-//#define DEFAULT_MAX_POWER (15)
-//#define NUM_OF_SNAKE_SHOWS (3)
-//#define DEFAULT_SNAKE_SHOW_FADE_OUT_STEPS (10) //in how many steps the snakes should fade out (for shut down sequence)
-//#define DEFAULT_SNAKE_SHOW_REFRESH_TIME (20) //period time of refresh rate in milisec
-//#define DEFAULT_SNAKE_SHOW_CYCLE_LENGTH (15) //this is the length of the cycle of one snake (one snake length + gap to next snake)
-//#define DEFAULT_SNAKE_SHOW_SNAKE_LENGTH (15)
-//#define DEFAULT_SNAKE_SHOW_PERFORM_STRATUP_SEQ   (1)
-//#define DEFAULT_SNAKE_SHOW_STARTUP_SEQ_END_CYCLE (300)
-//#define GAMMA_COLORS (10)
-//
-//#define TEDDY_BEAR_CYCLE_LENGTH (40)
-//#define TEDDY_BEAR_SNAKE_LENGTH (37)
-//
-//#define METEOR_LENGTH (61)
-//#define TOTAL_EXPLOSION_TIME (100)
-//#define EXPLOSION_PHASES (2)
-//#define EXPLOSION_PHASE1_TIME (30)
-//#define EXPLOSION_PHASE2_TIME (70)
-/* =========================================================================================== */
-/* ==  ENUMS == */
-/* =========================================================================================== */
-
-//typedef enum _shows
-//{
-//    SHOWS_SNAKE_0    = 0,
-//    SHOWS_SNAKE_1    = 1,
-//    SHOWS_SNAKE_2    = 2,
-//    SHOWS_TEDDY_BEAR = 3,
-//    SHOWS_METEOR     = 4
-//} show_id_e;
-//
-//typedef enum _show_status
-//{
-//    SHOW_STATUS_DISABLED = 0, //show is not running
-//    SHOW_STATUS_START    = 1, //show received start running command from interrupt
-//    SHOW_STATUS_RUNNING  = 2, //show is running
-//    SHOW_STATUS_STOP     = 3  //show received stop running command from interrupt
-//} show_status_e;
+typedef enum _next_frame
+{
+    NEXT_FRAME_NO_CHANGE,
+    NEXT_FRAME_MOVE_FORWARD,
+    NEXT_FRAME_MOVE_BACKWARD,
+    NEXT_FRAME_RESET,
+} next_frame_e;
 
 /* =========================================================================================== */
-/* ==  STRUCTS == */
+/*   STRUCTS AND TYPE DEFINITIONS                                                                               */
+/* =========================================================================================== */
+/**
+  * @brief   Set frame function receives pointer to frame, and updates it for next frame
+  * @param   uint16_t - show id
+  * @param   uint8_t* - pointer to frame
+  * @retval  void
+  * @details This function will receive a pointer to the frame, which will be already prepared according to the
+  *          next_frame configuration of the show database. It will update the frame with the new frame that
+  *          will be shown
+  */
+typedef void (*set_frame_func)(uint16_t show_id, uint8_t* frame);
+
+typedef struct show_db
+{
+    show_mode_e     show_mode;          /* What kind of a show it is */
+    next_frame_e    next_frame;         /* how to prepare next frame for the set_frame function */
+    uint16_t        frame_duration;     /* how long this frame will run, in msec, value range: 20-1000 */
+    uint8_t         fade_in_enable;     /* boolean - perform fade in on start of show */
+    uint8_t         fade_out_enable;    /* boolean - perform fade out on end of show */
+    uint8_t         max_power;          /* maximum power of the LEDS in percentage, values 0-100 */
+    uint8_t         direction;          /* direction of the show, 0 - from entry of strip to end, 1 - from end of strip to the entry */
+    uint8_t         image_speed;        /* move image every image_speed frames (RUNNING_IMAGE only) */
+    set_frame_func  set_frame;          /* pointer to the set frame function of the show (FRAME_BY_FRAME only) */
+    uint8_t*        image;              /* pointer to the image */
+} show_db_t;
+
+typedef struct show_q_item
+{
+    uint16_t        show_id;            /* show_id*/
+    uint32_t        frame_index;        /* frame_idx */
+} show_q_item_t;
+
+/**
+  * @brief   initialization of show database
+  * @param   uint16_t - show id
+  * @param   show_db_t* - pointer to show database
+  * @retval  void
+  * @details This function will receive a pointer to the show database, and will update it.
+  *          This funciton will be called on initialization of the system
+  */
+typedef void (*init_show)(uint16_t show_id, show_db_t* show_db);
+
+/* =========================================================================================== */
+/*   MACROS                                                                                    */
+/* =========================================================================================== */
+//#define SET_POWER(show, power) (uint8_t)(((double)(shows[show].max_power)/100)*power)
+
+/* =========================================================================================== */
+/*   PUBLIC FUNCTION DECLARATION                                                               */
 /* =========================================================================================== */
 
-//typedef struct show_db
-//{
-//	show_status_e status;
-//    uint8_t direction;
-//    uint8_t max_power;
-//} show_db_t;
-//
-//typedef struct snake_show_db
-//{ /* for flash purposes needs to be 32 bit aligned */
-//    uint8_t refresh_time; /* refresh rate in cycle time [milisec] */
-//    uint8_t fade_out_steps; /* how many fade out steps to perform on shut down */
-//    uint8_t perform_startup_seq; /* 0x0 - no startup, snakes starting to run from beginning of strip; 0x1 - startup performed and whole strip is filled with snakes at the beginning */
-//    uint8_t snake_length; /* length of snake in a cycle --> cycle_length=100 and snake_length=50 --> on a 300 led strip there will be three snakes of 50 leds each */
-//    uint16_t cycle_length; /* length of snake and turned off area --> if cycle_length equals 100 in a 300 led strip it means only three snake will appear (max value = 255) */
-//    uint16_t starup_seq_end_cycle; /* for how long to run the startup sequence before starting regular */
-//    //uint32_t reserved;
-//    uint8_t direction;
-//    uint8_t max_power;
-//    uint8_t reserved0;
-//    uint8_t reserved1;
-//} snake_show_db_t;
-//
-//typedef struct flash_show_config_db
-//{ /* for flash purposes needs to be 32 bit aligned */
-//    uint32_t magic_word;
-//    snake_show_db_t snake[NUM_OF_SNAKE_SHOWS];
-//} flash_show_config_db_t;
 
 /* =========================================================================================== */
-/* ==  MACROS == */
+/*   USER SHOWS DEFINITIONS AND DECLARATIONS                                                   */
 /* =========================================================================================== */
+typedef enum _show_id
+{
+    SHOW_ID_SNAKE,
+    SHOW_ID_STARS,
+    NUM_OF_SHOW
+} show_id_e;
 
-#define SET_POWER(show, power) (uint8_t)(((double)(shows[show].max_power)/100)*power)
+void snake_show_init(uint16_t show_id, show_db_t* show_db);
+void stars_show_init(uint16_t show_id, show_db_t* show_db);
 
-/* =========================================================================================== */
-/* ==  PUBLIC FUNCTIONS== */
-/* =========================================================================================== */
-
-///**
-//  * @brief  show callback function, all shows functions should be of this type.
-//  * @param  void
-//  * @retval void
-//  */
-//typedef void (*show_cb_function)(void);
-//
-///**
-//  * @brief  wrapper function for snake show #0
-//  * @param  void
-//  * @retval void
-//  */
-//void snake_show_0(void);
-//
-///**
-//  * @brief  wrapper function for snake show #1
-//  * @param  void
-//  * @retval void
-//  */
-//void snake_show_1(void);
-//
-///**
-//  * @brief  wrapper function for snake show #2
-//  * @param  void
-//  * @retval void
-//  */
-//void snake_show_2(void);
-//
-///**
-//  * @brief  snake show, runs colorful snakes through the LED strips.
-//  * @param  void
-//  * @retval void
-//  */
-//void snake_show(uint8_t snake_id);
-//
-///**
-//  * @brief  initialize shows database.
-//  * @param  void
-//  * @retval void
-//  */
-//void init_shows(void);
-//
-///**
-//  * @brief  Stores current configuration to flash
-//  * @param  void
-//  * @retval void
-//  */
-//void store_config_to_flash(void);
-//
-///**
-//  * @brief  Loads default configuration
-//  * @param  void
-//  * @retval void
-//  */
-//void load_default_configuration(void);
-//
-///**
-//  * @brief  Loads configuration from flash
-//  * @param  void
-//  * @retval void
-//  */
-//void load_config_from_flash(void);
-//
-//void teady_bear(void);
-//
-///**
-//  * @brief  comet show, stars, comet and explosion.
-//  * @param  void
-//  * @retval void
-//  */
-//void MeteorShow(void);
-//
-///**
-//  * @brief  TwinklingStars - stars shining and dimming down.
-//  * @param  void
-//  * @retval void
-//  */
-//void TwinklingStars(void);
-//
-///**
-//  * @brief  MeteorDrop - Meteor falling.
-//  * @param  void
-//  * @retval void
-//  */
-//void MeteorDrop(void);
-//
-///**
-//  * @brief  MeteorExplosion - Boom!.
-//  * @param  void
-//  * @retval void
-//  */
-//void MeteorExplosion(void);
-//
-///**
-//  * @brief  initialize shows database for cloud system type.
-//  * @param  void
-//  * @retval void
-//  */
-//void init_clouds(void);
+#define LIST_OF_INIT_FUNCTIONS {snake_show_init, \
+		                        stars_show_init}
 
 #endif  /* _SHOWS_H */
+
