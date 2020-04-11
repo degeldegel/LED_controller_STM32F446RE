@@ -1,15 +1,56 @@
 #include "stm32f4xx_hal.h"
 #include "ws2812b_multi_strip_driver.h"
+#include "main.h"
 
+/* =========================================================================================== */
+/*   PRIVATE DEFINES                                                                           */
+/* =========================================================================================== */
+#define MAX_SUPPORTED_NUM_OF_PORTS (2)
+#define BITS_TO_CONFIGURE_ONE_LED (24)
+#define MAX_LEDS_IN_STRIP (300)
+#define MAX_ACTIVE_STRIPS (4)
+#define BITS_IN_BYTE (8)
+#define GPIO_PRT_NA (255)
+#define GPIO_PIN_NA ((uint16_t)0x0000)
+#define CYCLES_DELAY_COMPENSATION (12)
+
+#define GPIO_PORT_B (0)
+#define GPIO_PORT_C (1)
+#define LED_STRIP_0_Port  (LED_STRIP_0_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_1_Port  (LED_STRIP_1_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_2_Port  (LED_STRIP_2_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_3_Port  (LED_STRIP_3_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_4_Port  (LED_STRIP_4_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_5_Port  (LED_STRIP_5_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_6_Port  (LED_STRIP_6_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_7_Port  (LED_STRIP_7_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_8_Port  (LED_STRIP_8_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_9_Port  (LED_STRIP_9_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_10_Port (LED_STRIP_10_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_11_Port (LED_STRIP_11_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_12_Port (LED_STRIP_12_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_13_Port (LED_STRIP_13_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_14_Port (LED_STRIP_14_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_15_Port (LED_STRIP_15_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_16_Port (LED_STRIP_16_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_17_Port (LED_STRIP_17_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_18_Port (LED_STRIP_18_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+#define LED_STRIP_19_Port (LED_STRIP_19_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+
+/* =========================================================================================== */
+/* Private MACROS                                                                              */
+/* =========================================================================================== */
+#define GET_STRIP_PORT(strip) (strip_ports[strip])
+#define GET_STRIP_GPIO(strip) (strip_GPIOs[strip])
+
+/* =========================================================================================== */
+/* STATIC VARIABLES                                                                            */
+/* =========================================================================================== */
 /*contains masks of all bits that are zero in PortB/C*/
 uint16_t GPIO_strips_mask[MAX_SUPPORTED_NUM_OF_PORTS][MAX_SUPPORTED_LEDS_IN_STRIP * BITS_TO_CONFIGURE_ONE_LED];
 
 /*active GPIOs in the port 0 - portB, 1 - portC */
 uint16_t GPIO_all_strips_mask[MAX_SUPPORTED_NUM_OF_PORTS];
-
-/* user interface db, the user fills up this array according to LED strip id and led number,
- * the driver will push the LED strips according to this db */
-uint8_t  LED_strips[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED] = {0};
 
 uint8_t strip_ports[MAX_SUPPORTED_NUM_OF_STRIPS] =
          /*  Strip #0               Strip #1                Strip #2                Strip #3                Strip #4  */
@@ -30,7 +71,9 @@ uint16_t strip_GPIOs[MAX_SUPPORTED_NUM_OF_STRIPS] =
          /*  Strip #15              Strip #16               Strip #17               Strip #18               Strip #19 */
          LED_STRIP_15_Pin,      LED_STRIP_16_Pin,       LED_STRIP_17_Pin,       LED_STRIP_18_Pin,       LED_STRIP_19_Pin};
 
-
+/* =========================================================================================== */
+/* PRIVATE FUNCTIONS                                                                           */
+/* =========================================================================================== */
 /**
   * @brief  This functions performs the actual update of the GPIOs of the strip LEDs. it is using the masks updated in function
   *         update_driver_masks. this is the heart of the multi strip driver, it updates the PORTs of the GPIOs, this enables it
@@ -94,7 +137,7 @@ void zero_all_driver_masks(void)
   * @param  void
   * @retval void
   */
-void update_driver_masks(void)
+void update_driver_masks(uint8_t*** LED_strips)
 {
 	int led_idx, rgb_idx, strip_idx;
 	zero_all_driver_masks();
@@ -103,9 +146,9 @@ void update_driver_masks(void)
 		int curr_strip_port, curr_strip_gpio_msk;
 		curr_strip_port = GET_STRIP_PORT(strip_idx);
 		curr_strip_gpio_msk = GET_STRIP_GPIO(strip_idx);
-		for (led_idx=0; led_idx < MAX_LEDS_IN_STRIP; led_idx ++)
+		for (led_idx=0; led_idx < MAX_LEDS_IN_STRIP; led_idx++)
 		{
-			for (rgb_idx=0; rgb_idx < NUM_OF_CFG_BYTES_PER_LED; rgb_idx ++)
+			for (rgb_idx=0; rgb_idx < NUM_OF_CFG_BYTES_PER_LED; rgb_idx++)
 			{
 				uint8_t cur_rgb_led;
 				cur_rgb_led = LED_strips[strip_idx][led_idx][rgb_idx];
@@ -135,16 +178,27 @@ void update_GPIO_all_strips_mask(uint8_t port, uint16_t update_mask)
     GPIO_all_strips_mask[port] = update_mask;
 }
 
+/* =========================================================================================== */
+/* PUBLIC FUNCTIONS                                                                            */
+/* =========================================================================================== */
 /**
-  * @brief  main function that drives the strips, it should be called after the LED_strips db is updated with the new output.
-  *         all strips are updated on parallel.
+  * @brief  main function that drives the strips
   * @param  void
   * @retval void
   */
 void drive_LED_strips(void)
 {
-    update_driver_masks();
     drive_ws2812b_LED_strips_via_GPIO_ports();
+}
+
+/**
+  * @brief  Function updates driver's strips database based on frame received from the user
+  * @param  void
+  * @retval void
+  */
+void update_LED_strips(uint8_t*** frame)
+{
+    update_driver_masks(frame);
 }
 
 /**

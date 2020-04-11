@@ -10,6 +10,8 @@
 #ifndef _SHOWS_H
 #define _SHOWS_H
 
+#include "ws2812b_multi_strip_driver.h"
+
 /* =========================================================================================== */
 /*   DEFINES AND ENUMERATORS                                                                   */
 /* =========================================================================================== */
@@ -39,7 +41,7 @@ typedef enum _next_frame
   *          next_frame configuration of the show database. It will update the frame with the new frame that
   *          will be shown
   */
-typedef void (*set_frame_func)(uint16_t show_id, uint8_t* frame);
+typedef void (*set_frame_func)(uint16_t show_id, uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED]);
 
 typedef struct show_db
 {
