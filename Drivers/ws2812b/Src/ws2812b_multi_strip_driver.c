@@ -7,8 +7,6 @@
 /* =========================================================================================== */
 #define MAX_SUPPORTED_NUM_OF_PORTS (2)
 #define BITS_TO_CONFIGURE_ONE_LED (24)
-#define MAX_LEDS_IN_STRIP (300)
-#define MAX_ACTIVE_STRIPS (4)
 #define BITS_IN_BYTE (8)
 #define GPIO_PRT_NA (255)
 #define GPIO_PIN_NA ((uint16_t)0x0000)

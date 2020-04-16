@@ -6,12 +6,14 @@
   *
   ******************************************************************************
   */
+#include <string.h>
 #include "stm32f4xx_hal.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "shows.h"
 #include "porting_layer.h"
+#include "main.h"
 
 /* =========================================================================================== */
 /*   PRIVATE DEFINES                                                                           */
@@ -53,15 +55,37 @@ void prepare_frame(uint16_t show_id)
     {
         case NEXT_FRAME_NO_CHANGE:
         {
+            /* Do nothing - No change is needed */
         } break;
         case NEXT_FRAME_MOVE_FORWARD:
         {
+            int32_t led_id, strip_id;
+            for (strip_id=0; strip_id < MAX_ACTIVE_STRIPS; strip_id++)
+            {
+                for (led_id=(MAX_LEDS_IN_STRIP-1); led_id!=0; led_id--)
+                {
+                    gp_frame[strip_id][led_id][GREEN] = gp_frame[strip_id][led_id-1][GREEN];
+                    gp_frame[strip_id][led_id][RED]   = gp_frame[strip_id][led_id-1][RED];
+                    gp_frame[strip_id][led_id][BLUE]  = gp_frame[strip_id][led_id-1][BLUE];
+                }
+            }
         } break;
         case NEXT_FRAME_MOVE_BACKWARD:
         {
+            int32_t led_id, strip_id;
+            for (strip_id=0; strip_id < MAX_ACTIVE_STRIPS; strip_id++)
+            {
+                for (led_id=0; led_id<(MAX_LEDS_IN_STRIP-1); led_id++)
+                {
+                    gp_frame[strip_id][led_id][GREEN] = gp_frame[strip_id][led_id-1][GREEN];
+                    gp_frame[strip_id][led_id][RED]   = gp_frame[strip_id][led_id-1][RED];
+                    gp_frame[strip_id][led_id][BLUE]  = gp_frame[strip_id][led_id-1][BLUE];
+                }
+            }
         } break;
         case NEXT_FRAME_RESET:
         {
+            memset(gp_frame, 0, sizeof(gp_frame));
         } break;
         default:
         {
@@ -77,7 +101,20 @@ void prepare_frame(uint16_t show_id)
   */
 void perform_power_correction(uint16_t show_id)
 {
-    //TODO
+    int32_t led_id, strip_id;
+    for (strip_id=0; strip_id < MAX_ACTIVE_STRIPS; strip_id++)
+    {
+        for (led_id=0; led_id < MAX_LEDS_IN_STRIP; led_id++)
+        {
+            uint32_t color, color_idx;
+            for (color_idx = 0; color_idx < NUM_OF_CFG_BYTES_PER_LED; color_idx++)
+            {
+                color = gp_frame[strip_id][led_id][color_idx];
+                color = color * gp_shows[show_id].max_power / 100;
+                gp_frame[strip_id][led_id][color_idx] = (uint8_t)color;
+            }
+        }
+    }
 }
 
 /**

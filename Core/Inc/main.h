@@ -111,6 +111,8 @@ void Error_Handler(void);
 #define LED_STRIP_18_Pin GPIO_PIN_9
 #define LED_STRIP_18_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
+#define MAX_LEDS_IN_STRIP (300)
+#define MAX_ACTIVE_STRIPS (4)
 
 /* USER CODE END Private defines */
 
