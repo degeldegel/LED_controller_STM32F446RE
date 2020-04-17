@@ -100,5 +100,21 @@ void stars_show_init(uint16_t show_id, show_db_t* show_db);
 #define LIST_OF_INIT_FUNCTIONS {snake_show_init, \
 		                        stars_show_init}
 
+/**
+  * @brief      init freeRTOS resources related to the shows
+  * @param      void
+  * @retval     void
+  * @details    initializes all resources related to shows
+  */
+void init_shows_rtos_resources(void);
+
+/**
+  * @brief      init freeRTOS tasks related to the shows
+  * @param      void
+  * @retval     void
+  * @details    initializes all tasks related to shows
+  */
+void init_shows_tasks(void);
+
 #endif  /* _SHOWS_H */
 

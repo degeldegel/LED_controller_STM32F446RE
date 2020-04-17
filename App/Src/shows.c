@@ -127,9 +127,6 @@ void perform_fade_in_out(uint16_t show_id)
     //TODO
 }
 
-/* =========================================================================================== */
-/*   PUBLIC FUNCTION                                                                           */
-/* =========================================================================================== */
 /**
   * @brief      init shows function
   * @param      void
@@ -180,13 +177,17 @@ void shows_task(void* p_argument)
     }
 }
 
+/* =========================================================================================== */
+/*   PUBLIC FUNCTION                                                                           */
+/* =========================================================================================== */
+
 /**
   * @brief      init freeRTOS resources related to the shows
   * @param      void
   * @retval     void
   * @details    initializes all resources related to shows
   */
-void shows_initRtosResources(void)
+void init_shows_rtos_resources(void)
 {
     /* shows Queue */
     gp_show_q = xQueueCreate(Q_SHOWS_LENGTH, Q_SHOWS_ITEM_SIZE);
@@ -204,7 +205,7 @@ void shows_initRtosResources(void)
   * @retval     void
   * @details    initializes all tasks related to shows
   */
-void shows_initTasks(void)
+void init_shows_tasks(void)
 {
     /* Init shows task */
     BaseType_t res;
@@ -216,3 +217,14 @@ void shows_initTasks(void)
                       &gp_shows_task_handler);      // The task handle
     PL_ASSERT_COND(pdPASS == res);
 }
+
+/***********************************TEMP FOR COMPILATION**************************************/
+void snake_show_init(uint16_t show_id, show_db_t* show_db)
+{
+
+}
+void stars_show_init(uint16_t show_id, show_db_t* show_db)
+{
+
+}
+

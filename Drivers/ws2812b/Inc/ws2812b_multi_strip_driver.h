@@ -43,5 +43,21 @@ void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_
   */
 void init_led_strips(void);
 
+/**
+  * @brief      init freeRTOS resources related to the led driver
+  * @param      void
+  * @retval     void
+  * @details    initializes all resources related to led driver
+  */
+void init_led_driver_rtos_resources(void);
+
+/**
+  * @brief      init freeRTOS tasks related to the led driver
+  * @param      void
+  * @retval     void
+  * @details    initializes all tasks related to led driver
+  */
+void init_led_driver_tasks(void);
+
 #endif  /* _WS2812B_MULTI_STRIP_DRIVER_H */
 

@@ -1,6 +1,9 @@
 #include "stm32f4xx_hal.h"
 #include "ws2812b_multi_strip_driver.h"
 #include "main.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "porting_layer.h"
 
 /* =========================================================================================== */
 /*   PRIVATE DEFINES                                                                           */
@@ -12,6 +15,7 @@
 #define GPIO_PIN_NA ((uint16_t)0x0000)
 #define CYCLES_DELAY_COMPENSATION (12)
 
+/* GPIO related definitions */
 #define GPIO_PORT_B (0)
 #define GPIO_PORT_C (1)
 #define LED_STRIP_0_Port  (LED_STRIP_0_GPIO_Port  == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
@@ -34,6 +38,17 @@
 #define LED_STRIP_17_Port (LED_STRIP_17_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
 #define LED_STRIP_18_Port (LED_STRIP_18_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
 #define LED_STRIP_19_Port (LED_STRIP_19_GPIO_Port == GPIOB ? GPIO_PORT_B : GPIO_PORT_C)
+
+/*RTOS related definitions*/
+#define LED_DRIVER_TASK_STACK_SIZE       (128)
+#define LED_DRIVER_TASK_PRIO             (configMAX_PRIORITIES - 1)
+
+/* =========================================================================================== */
+/*   GLOBAL VARIABLES                                                                          */
+/* =========================================================================================== */
+TaskHandle_t gp_led_driver_task_handler = NULL;
+SemaphoreHandle_t gp_run_led_driver_sem = NULL;
+SemaphoreHandle_t gp_new_frame_sem = NULL;
 
 /* =========================================================================================== */
 /* Private MACROS                                                                              */
@@ -176,6 +191,33 @@ void update_gpio_all_strips_mask(uint8_t port, uint16_t update_mask)
     GPIO_all_strips_mask[port] = update_mask;
 }
 
+/**
+  * @brief      Main led driver task
+  * @param      void
+  * @param      void* additional arguments passed to task (NULL for this funciton)
+  * @retval     void
+  * @details    shows task implementation
+  */
+void led_driver_task(void* p_argument)
+{
+    BaseType_t result;
+    init_led_strips();
+    while (true)
+    {
+        result = xSemaphoreTake(gp_run_led_driver_sem, portMAX_DELAY);
+        PL_ASSERT_COND(result);
+        result = xSemaphoreTake(gp_new_frame_sem, 0);
+        if (result)
+        {
+            drive_led_strips();
+        }
+        else
+        {
+            PL_ASSERT();
+        }
+    }
+}
+
 /* =========================================================================================== */
 /* PUBLIC FUNCTIONS                                                                            */
 /* =========================================================================================== */
@@ -186,7 +228,9 @@ void update_gpio_all_strips_mask(uint8_t port, uint16_t update_mask)
   */
 void drive_led_strips(void)
 {
+    taskENTER_CRITICAL();
     drive_ws2812b_led_strips_via_gpio_ports();
+    taskEXIT_CRITICAL();
 }
 
 /**
@@ -197,6 +241,7 @@ void drive_led_strips(void)
 void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED])
 {
     update_driver_masks(frame);
+    PL_ASSERT_COND(xSemaphoreGive(gp_new_frame_sem));
 }
 
 /**
@@ -227,4 +272,44 @@ void init_led_strips(void)
     DWT->CTRL |= 1;
 
     drive_led_strips();
+}
+
+/**
+  * @brief      init freeRTOS resources related to the led driver
+  * @param      void
+  * @retval     void
+  * @details    initializes all resources related to led driver
+  */
+void init_led_driver_rtos_resources(void)
+{
+    /* driver Semaphores */
+    gp_run_led_driver_sem = xSemaphoreCreateBinary();
+    gp_new_frame_sem = xSemaphoreCreateBinary();
+
+    /* check Semaphores creation success */
+    PL_ASSERT_COND(gp_run_led_driver_sem);
+    PL_ASSERT_COND(gp_new_frame_sem);
+
+    /* adding Semaphores for debug */
+    vQueueAddToRegistry(gp_run_led_driver_sem, "Run driver Sem");
+    vQueueAddToRegistry(gp_new_frame_sem, "New frame Sem");
+}
+
+/**
+  * @brief      init freeRTOS tasks related to the led driver
+  * @param      void
+  * @retval     void
+  * @details    initializes all tasks related to led driver
+  */
+void init_led_driver_tasks(void)
+{
+    /* Init led driver task */
+    BaseType_t res;
+    res = xTaskCreate(led_driver_task,              // The task implementation
+                      "led driver main task",       // The task text name
+                      LED_DRIVER_TASK_STACK_SIZE,   // The task stack size
+                      NULL,                         // Optional Parameter
+                      LED_DRIVER_TASK_PRIO,         // The task priority
+                      &gp_led_driver_task_handler); // The task handle
+    PL_ASSERT_COND(pdPASS == res);
 }
