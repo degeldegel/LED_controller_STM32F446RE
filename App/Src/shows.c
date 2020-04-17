@@ -167,9 +167,10 @@ void shows_task(void* p_argument)
         if (gp_shows[show_id].show_mode == SHOW_MODE_FRAME_BY_FRAME)
         {
             prepare_frame(show_id);
-            gp_shows[show_id].set_frame(show_id, gp_frame);
+            gp_shows[show_id].set_frame(show_id, q_item.frame_index, gp_frame);
             perform_power_correction(show_id);
             perform_fade_in_out(show_id);
+            update_led_strips(gp_frame);
         }
         else
         {

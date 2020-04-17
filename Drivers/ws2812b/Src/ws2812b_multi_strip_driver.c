@@ -79,7 +79,7 @@ uint16_t strip_GPIOs[MAX_SUPPORTED_NUM_OF_STRIPS] =
   * @param  void
   * @retval void
   */
-void drive_ws2812b_LED_strips_via_GPIO_ports(void)
+void drive_ws2812b_led_strips_via_gpio_ports(void)
 {
 	int curr_led_bit_idx;
 	uint16_t curr_zero_mask[2];
@@ -132,10 +132,10 @@ void zero_all_driver_masks(void)
 
 /**
   * @brief  This function performs the conversion between the user interface AKA LED_strips and the driver db
-  * @param  void
+  * @param  uint8_t[strip_id][led_id][color] - pointer to led strips database
   * @retval void
   */
-void update_driver_masks(uint8_t*** LED_strips)
+void update_driver_masks(uint8_t LED_strips[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED])
 {
 	int led_idx, rgb_idx, strip_idx;
 	zero_all_driver_masks();
@@ -171,7 +171,7 @@ void update_driver_masks(uint8_t*** LED_strips)
   *
   * @retval void
   */
-void update_GPIO_all_strips_mask(uint8_t port, uint16_t update_mask)
+void update_gpio_all_strips_mask(uint8_t port, uint16_t update_mask)
 {
     GPIO_all_strips_mask[port] = update_mask;
 }
@@ -184,17 +184,17 @@ void update_GPIO_all_strips_mask(uint8_t port, uint16_t update_mask)
   * @param  void
   * @retval void
   */
-void drive_LED_strips(void)
+void drive_led_strips(void)
 {
-    drive_ws2812b_LED_strips_via_GPIO_ports();
+    drive_ws2812b_led_strips_via_gpio_ports();
 }
 
 /**
   * @brief  Function updates driver's strips database based on frame received from the user
-  * @param  void
+  * @param  uint8_t[strip_id][led_id][color] - pointer to frame
   * @retval void
   */
-void update_LED_strips(uint8_t*** frame)
+void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED])
 {
     update_driver_masks(frame);
 }
@@ -205,7 +205,7 @@ void update_LED_strips(uint8_t*** frame)
   * @param  void
   * @retval void
   */
-void init_LED_strips(void)
+void init_led_strips(void)
 {
     uint8_t led_strip_idx;
     uint16_t port_b_active_strips_mask = GPIO_PIN_NA, port_c_active_strips_mask = GPIO_PIN_NA;
@@ -220,11 +220,11 @@ void init_LED_strips(void)
             port_c_active_strips_mask |= strip_GPIOs[led_strip_idx];
         }
     }
-    update_GPIO_all_strips_mask(GPIO_PORT_B, port_b_active_strips_mask);
-    update_GPIO_all_strips_mask(GPIO_PORT_C, port_c_active_strips_mask);
+    update_gpio_all_strips_mask(GPIO_PORT_B, port_b_active_strips_mask);
+    update_gpio_all_strips_mask(GPIO_PORT_C, port_c_active_strips_mask);
 
     // enable DWT counter used for timing of the driver
     DWT->CTRL |= 1;
 
-    drive_LED_strips();
+    drive_led_strips();
 }

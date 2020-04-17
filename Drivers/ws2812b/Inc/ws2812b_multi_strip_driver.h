@@ -26,14 +26,14 @@ enum {
   * @param  void
   * @retval void
   */
-void drive_LED_strips(void);
+void drive_led_strips(void);
 
 /**
   * @brief  Function updates driver's strips database based on frame received from the user
-  * @param  void
+  * @param  uint8_t[strip_id][led_id][color] - pointer to frame
   * @retval void
   */
-void update_LED_strips(uint8_t*** frame);
+void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED]);
 
 /**
   * @brief  Performs initialization of all strips and masks used by the multi strip driver.
@@ -41,7 +41,7 @@ void update_LED_strips(uint8_t*** frame);
   * @param  void
   * @retval void
   */
-void init_LED_strips(void);
+void init_led_strips(void);
 
 #endif  /* _WS2812B_MULTI_STRIP_DRIVER_H */
 

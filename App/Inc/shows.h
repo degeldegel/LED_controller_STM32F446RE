@@ -35,13 +35,14 @@ typedef enum _next_frame
 /**
   * @brief   Set frame function receives pointer to frame, and updates it for next frame
   * @param   uint16_t - show id
-  * @param   uint8_t* - pointer to frame
+  * @param   uint32_t - Running frame index, index 0 is first frame of show
+  * @param   uint8_t[strip_id][led_id][color] - pointer to frame
   * @retval  void
   * @details This function will receive a pointer to the frame, which will be already prepared according to the
   *          next_frame configuration of the show database. It will update the frame with the new frame that
   *          will be shown
   */
-typedef void (*set_frame_func)(uint16_t show_id, uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED]);
+typedef void (*set_frame_func)(uint16_t show_id, uint32_t frame_idx, uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED]);
 
 typedef struct show_db
 {
