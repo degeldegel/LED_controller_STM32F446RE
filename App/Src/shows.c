@@ -101,20 +101,23 @@ void prepare_frame(uint16_t show_id)
   */
 void perform_power_correction(uint16_t show_id)
 {
-    int32_t led_id, strip_id;
-    for (strip_id=0; strip_id < MAX_ACTIVE_STRIPS; strip_id++)
-    {
-        for (led_id=0; led_id < MAX_LEDS_IN_STRIP; led_id++)
-        {
-            uint32_t color, color_idx;
-            for (color_idx = 0; color_idx < NUM_OF_CFG_BYTES_PER_LED; color_idx++)
-            {
-                color = gp_frame[strip_id][led_id][color_idx];
-                color = color * gp_shows[show_id].max_power / 100;
-                gp_frame[strip_id][led_id][color_idx] = (uint8_t)color;
-            }
-        }
-    }
+    /*TODO - power correction can't happen on the frame as it will mess up users code,
+             it has to be done inside strip update on the go */
+
+//    int32_t led_id, strip_id;
+//    for (strip_id=0; strip_id < MAX_ACTIVE_STRIPS; strip_id++)
+//    {
+//        for (led_id=0; led_id < MAX_LEDS_IN_STRIP; led_id++)
+//        {
+//            uint32_t color, color_idx;
+//            for (color_idx = 0; color_idx < NUM_OF_CFG_BYTES_PER_LED; color_idx++)
+//            {
+//                color = gp_frame[strip_id][led_id][color_idx];
+//                color = color * gp_shows[show_id].max_power / 100;
+//                gp_frame[strip_id][led_id][color_idx] = (uint8_t)color;
+//            }
+//        }
+//    }
 }
 
 /**
