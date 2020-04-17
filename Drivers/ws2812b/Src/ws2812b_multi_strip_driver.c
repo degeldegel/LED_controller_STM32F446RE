@@ -245,6 +245,22 @@ void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_
 }
 
 /**
+  * @brief  Releases driver's main task semaphore to run driver
+  * @param  void
+  * @retval void
+  * @attention This function should run from interrupt only
+  */
+void start_led_driver_run(void)
+{
+    BaseType_t pxHigherPriorityTaskWoken;
+    PL_ASSERT_COND(xSemaphoreGiveFromISR(gp_run_led_driver_sem, &pxHigherPriorityTaskWoken));
+    if (pxHigherPriorityTaskWoken)
+    {
+        PL_ASSERT();
+    }
+}
+
+/**
   * @brief  Performs initialization of all strips and masks used by the multi strip driver.
   *         Also drives cleared output to shut all active LEDs in strips.
   * @param  void

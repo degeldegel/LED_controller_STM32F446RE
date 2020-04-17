@@ -36,6 +36,14 @@ void drive_led_strips(void);
 void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED]);
 
 /**
+  * @brief  Releases driver's main task semaphore to run driver
+  * @param  void
+  * @retval void
+  * @attention This function should run from interrupt only
+  */
+void start_led_driver_run(void);
+
+/**
   * @brief  Performs initialization of all strips and masks used by the multi strip driver.
   *         Also drives cleared output to shut all active LEDs in strips.
   * @param  void
