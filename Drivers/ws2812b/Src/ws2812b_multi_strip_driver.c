@@ -196,7 +196,7 @@ void update_gpio_all_strips_mask(uint8_t port, uint16_t update_mask)
   * @param      void
   * @param      void* additional arguments passed to task (NULL for this funciton)
   * @retval     void
-  * @details    shows task implementation
+  * @details    led driver task implementation
   */
 void led_driver_task(void* p_argument)
 {

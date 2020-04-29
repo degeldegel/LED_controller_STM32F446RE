@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */     
 #include "ws2812b_multi_strip_driver.h"
 #include "shows.h"
+#include "scheduler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -112,6 +113,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
   init_led_driver_rtos_resources();
   init_shows_rtos_resources();
+  init_scheduler_rtos_resources();
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -138,7 +140,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_THREADS */
   init_led_driver_tasks();
   init_shows_tasks();
-
+  init_scheduler_tasks();
   /* USER CODE END RTOS_THREADS */
 
 }

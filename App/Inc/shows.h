@@ -101,6 +101,16 @@ void stars_show_init(uint16_t show_id, show_db_t* show_db);
 		                        stars_show_init}
 
 /**
+  * @brief      sends queue item to show task
+  * @param      uint16_t    show id that should run
+  * @param      uint32_t    frame index of next frame to run
+  * @retval     void
+  * @details    This funciton receives show id that should run the next frame and frame index
+  *             that should run. starts the show task by posting to tasks queue
+  */
+void run_show(uint16_t show_id, uint32_t frame_idx);
+
+/**
   * @brief      init freeRTOS resources related to the shows
   * @param      void
   * @retval     void

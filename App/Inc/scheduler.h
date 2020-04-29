@@ -34,8 +34,20 @@
 /* =========================================================================================== */
 /*   PUBLIC FUNCTION DECLARATION                                                               */
 /* =========================================================================================== */
+/**
+  * @brief      init freeRTOS resources related to the scheduler
+  * @param      void
+  * @retval     void
+  * @details    initializes all resources related to scheduler
+  */
+void init_scheduler_rtos_resources(void);
 
-//uint16_t scheduler_timer_handler(void);
-//void init_scheduler(void);
+/**
+  * @brief      init freeRTOS tasks related to the scheduler
+  * @param      void
+  * @retval     void
+  * @details    initializes all tasks related to scheduler
+  */
+void init_scheduler_tasks(void);
 
 #endif /* SCHEDULER_H_ */

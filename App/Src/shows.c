@@ -183,7 +183,21 @@ void shows_task(void* p_argument)
 /* =========================================================================================== */
 /*   PUBLIC FUNCTION                                                                           */
 /* =========================================================================================== */
-
+/**
+  * @brief      sends queue item to show task
+  * @param      uint16_t    show id that should run
+  * @param      uint32_t    frame index of next frame to run
+  * @retval     void
+  * @details    This funciton receives show id that should run the next frame and frame index
+  *             that should run. starts the show task by posting to tasks queue
+  */
+void run_show(uint16_t show_id, uint32_t frame_idx)
+{
+    show_q_item_t q_item;
+    q_item.show_id = show_id;
+    q_item.frame_index = frame_idx;
+    PL_ASSERT_COND(xQueueSend(gp_show_q, &q_item, 0));
+}
 /**
   * @brief      init freeRTOS resources related to the shows
   * @param      void
