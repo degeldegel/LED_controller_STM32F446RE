@@ -6,16 +6,16 @@
 /* =========================================================================================== */
 #define MAX_SUPPORTED_NUM_OF_STRIPS (20)
 #define MAX_SUPPORTED_LEDS_IN_STRIP (300)
-#define NUM_OF_CFG_BYTES_PER_LED (3)
 
 /* =========================================================================================== */
 /*   ENUMERATORS                                                                               */
 /* =========================================================================================== */
 
 enum {
-	GREEN 	= 0,
-	RED 	= 1,
-	BLUE 	= 2
+	RGB_GREEN,
+	RGB_RED,
+	RGB_BLUE,
+	MAX_RGB_PER_LED
 };
 
 /* =========================================================================================== */
@@ -33,7 +33,7 @@ void drive_led_strips(void);
   * @param  uint8_t[strip_id][led_id][color] - pointer to frame
   * @retval void
   */
-void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED]);
+void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][MAX_RGB_PER_LED]);
 
 /**
   * @brief  Releases driver's main task semaphore to run driver

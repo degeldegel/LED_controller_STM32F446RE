@@ -34,7 +34,7 @@ QueueHandle_t gp_show_q = NULL;
 
 /* user interface db, the user fills up this array according to LED strip id and led number,
  * the driver will push the LED strips according to this db */
-uint8_t  gp_frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED] = {0};
+uint8_t  gp_frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][MAX_RGB_PER_LED] = {0};
 
 /* =========================================================================================== */
 /*   STATIC VARIABLES                                                                          */
@@ -64,9 +64,9 @@ void prepare_frame(uint16_t show_id)
             {
                 for (led_id=(MAX_LEDS_IN_STRIP-1); led_id!=0; led_id--)
                 {
-                    gp_frame[strip_id][led_id][GREEN] = gp_frame[strip_id][led_id-1][GREEN];
-                    gp_frame[strip_id][led_id][RED]   = gp_frame[strip_id][led_id-1][RED];
-                    gp_frame[strip_id][led_id][BLUE]  = gp_frame[strip_id][led_id-1][BLUE];
+                    gp_frame[strip_id][led_id][RGB_GREEN] = gp_frame[strip_id][led_id-1][RGB_GREEN];
+                    gp_frame[strip_id][led_id][RGB_RED]   = gp_frame[strip_id][led_id-1][RGB_RED];
+                    gp_frame[strip_id][led_id][RGB_BLUE]  = gp_frame[strip_id][led_id-1][RGB_BLUE];
                 }
             }
         } break;
@@ -77,9 +77,9 @@ void prepare_frame(uint16_t show_id)
             {
                 for (led_id=0; led_id<(MAX_LEDS_IN_STRIP-1); led_id++)
                 {
-                    gp_frame[strip_id][led_id][GREEN] = gp_frame[strip_id][led_id-1][GREEN];
-                    gp_frame[strip_id][led_id][RED]   = gp_frame[strip_id][led_id-1][RED];
-                    gp_frame[strip_id][led_id][BLUE]  = gp_frame[strip_id][led_id-1][BLUE];
+                    gp_frame[strip_id][led_id][RGB_GREEN] = gp_frame[strip_id][led_id-1][RGB_GREEN];
+                    gp_frame[strip_id][led_id][RGB_RED]   = gp_frame[strip_id][led_id-1][RGB_RED];
+                    gp_frame[strip_id][led_id][RGB_BLUE]  = gp_frame[strip_id][led_id-1][RGB_BLUE];
                 }
             }
         } break;
@@ -110,7 +110,7 @@ void perform_power_correction(uint16_t show_id)
 //        for (led_id=0; led_id < MAX_LEDS_IN_STRIP; led_id++)
 //        {
 //            uint32_t color, color_idx;
-//            for (color_idx = 0; color_idx < NUM_OF_CFG_BYTES_PER_LED; color_idx++)
+//            for (color_idx = 0; color_idx < MAX_RGB_PER_LED; color_idx++)
 //            {
 //                color = gp_frame[strip_id][led_id][color_idx];
 //                color = color * gp_shows[show_id].max_power / 100;
@@ -236,10 +236,6 @@ void init_shows_tasks(void)
 }
 
 /***********************************TEMP FOR COMPILATION**************************************/
-void snake_show_init(uint16_t show_id, show_db_t* show_db)
-{
-
-}
 void stars_show_init(uint16_t show_id, show_db_t* show_db)
 {
 

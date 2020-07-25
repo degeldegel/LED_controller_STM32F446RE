@@ -150,7 +150,7 @@ void zero_all_driver_masks(void)
   * @param  uint8_t[strip_id][led_id][color] - pointer to led strips database
   * @retval void
   */
-void update_driver_masks(uint8_t LED_strips[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED])
+void update_driver_masks(uint8_t LED_strips[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][MAX_RGB_PER_LED])
 {
 	int led_idx, rgb_idx, strip_idx;
 	zero_all_driver_masks();
@@ -161,7 +161,7 @@ void update_driver_masks(uint8_t LED_strips[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUP
 		curr_strip_gpio_msk = GET_STRIP_GPIO(strip_idx);
 		for (led_idx=0; led_idx < MAX_LEDS_IN_STRIP; led_idx++)
 		{
-			for (rgb_idx=0; rgb_idx < NUM_OF_CFG_BYTES_PER_LED; rgb_idx++)
+			for (rgb_idx=0; rgb_idx < MAX_RGB_PER_LED; rgb_idx++)
 			{
 				uint8_t cur_rgb_led;
 				cur_rgb_led = LED_strips[strip_idx][led_idx][rgb_idx];
@@ -238,7 +238,7 @@ void drive_led_strips(void)
   * @param  uint8_t[strip_id][led_id][color] - pointer to frame
   * @retval void
   */
-void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][NUM_OF_CFG_BYTES_PER_LED])
+void update_led_strips(uint8_t frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][MAX_RGB_PER_LED])
 {
     update_driver_masks(frame);
     PL_ASSERT_COND(xSemaphoreGive(gp_new_frame_sem));
