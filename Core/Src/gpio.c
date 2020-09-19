@@ -30,9 +30,9 @@
 
 /* USER CODE END 1 */
 
-/** Configure pins as 
-        * Analog 
-        * Input 
+/** Configure pins as
+        * Analog
+        * Input
         * Output
         * EVENT_OUT
         * EXTI
@@ -48,16 +48,16 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LED_STRIP_1_Pin|LED_STRIP_3_Pin|LED_STRIP_5_Pin|LED_STRIP_7_Pin 
-                          |LED_STRIP_9_Pin|LED_STRIP_11_Pin|LED_STRIP_13_Pin|LED_STRIP_15_Pin 
+  HAL_GPIO_WritePin(GPIOC, LED_STRIP_1_Pin|LED_STRIP_3_Pin|LED_STRIP_5_Pin|LED_STRIP_7_Pin
+                          |LED_STRIP_9_Pin|LED_STRIP_11_Pin|LED_STRIP_13_Pin|LED_STRIP_15_Pin
                           |LED_STRIP_17_Pin|LED_STRIP_19_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LED_STRIP_0_Pin|LED_STRIP_2_Pin|LED_STRIP_4_Pin|LED_STRIP_6_Pin 
-                          |LED_STRIP_8_Pin|LED_STRIP_10_Pin|LED_STRIP_12_Pin|LED_STRIP_14_Pin 
+  HAL_GPIO_WritePin(GPIOB, LED_STRIP_0_Pin|LED_STRIP_2_Pin|LED_STRIP_4_Pin|LED_STRIP_6_Pin
+                          |LED_STRIP_8_Pin|LED_STRIP_10_Pin|LED_STRIP_12_Pin|LED_STRIP_14_Pin
                           |LED_STRIP_16_Pin|LED_STRIP_18_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PtPin */
@@ -66,11 +66,11 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PCPin PCPin PCPin PCPin 
-                           PCPin PCPin PCPin PCPin 
+  /*Configure GPIO pins : PCPin PCPin PCPin PCPin
+                           PCPin PCPin PCPin PCPin
                            PCPin PCPin */
-  GPIO_InitStruct.Pin = LED_STRIP_1_Pin|LED_STRIP_3_Pin|LED_STRIP_5_Pin|LED_STRIP_7_Pin 
-                          |LED_STRIP_9_Pin|LED_STRIP_11_Pin|LED_STRIP_13_Pin|LED_STRIP_15_Pin 
+  GPIO_InitStruct.Pin = LED_STRIP_1_Pin|LED_STRIP_3_Pin|LED_STRIP_5_Pin|LED_STRIP_7_Pin
+                          |LED_STRIP_9_Pin|LED_STRIP_11_Pin|LED_STRIP_13_Pin|LED_STRIP_15_Pin
                           |LED_STRIP_17_Pin|LED_STRIP_19_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -84,11 +84,11 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PBPin PBPin PBPin PBPin 
-                           PBPin PBPin PBPin PBPin 
+  /*Configure GPIO pins : PBPin PBPin PBPin PBPin
+                           PBPin PBPin PBPin PBPin
                            PBPin PBPin */
-  GPIO_InitStruct.Pin = LED_STRIP_0_Pin|LED_STRIP_2_Pin|LED_STRIP_4_Pin|LED_STRIP_6_Pin 
-                          |LED_STRIP_8_Pin|LED_STRIP_10_Pin|LED_STRIP_12_Pin|LED_STRIP_14_Pin 
+  GPIO_InitStruct.Pin = LED_STRIP_0_Pin|LED_STRIP_2_Pin|LED_STRIP_4_Pin|LED_STRIP_6_Pin
+                          |LED_STRIP_8_Pin|LED_STRIP_10_Pin|LED_STRIP_12_Pin|LED_STRIP_14_Pin
                           |LED_STRIP_16_Pin|LED_STRIP_18_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
