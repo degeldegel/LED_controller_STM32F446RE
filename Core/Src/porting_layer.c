@@ -7,6 +7,7 @@
 
 #include "porting_layer.h"
 #include "main.h"
+#include "tim.h"
 
 /* =========================================================================================== */
 /*   GLOBAL VARIABLES                                                                          */
@@ -23,6 +24,15 @@
 /* =========================================================================================== */
 /*   PUBLIC FUNCTION                                                                           */
 /* =========================================================================================== */
+/**
+  * @brief  This function performs assert handling
+  * @param  void
+  * @retval void
+  */
+void pl_start_frame_timer(void)
+{
+    HAL_TIM_Base_Start_IT(&htim3);
+}
 
 /**
   * @brief  This function performs assert handling

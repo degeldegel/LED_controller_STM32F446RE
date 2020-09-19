@@ -27,6 +27,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "porting_layer.h"
 #include "ws2812b_multi_strip_driver.h"
 /* USER CODE END Includes */
 
@@ -186,8 +187,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-  else if (htim->Instance == TIM1)
+  else if (htim->Instance == TIM3)
   {
+      pl_start_frame_timer();
       start_led_driver_run();
   }
   /* USER CODE END Callback 1 */

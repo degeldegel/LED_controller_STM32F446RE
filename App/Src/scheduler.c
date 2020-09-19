@@ -111,7 +111,7 @@ void init_scheduler(void)
 //        schdlr_db.show[show_idx].showId = show_idx;
 //        schdlr_db.show[show_idx].played = SCHDLR_SHOW_DIDNT_PLAY;
 //    }
-//    HAL_TIM_Base_Start_IT(&htim3);
+    pl_start_frame_timer();
 }
 
 /**
@@ -137,6 +137,16 @@ void scheduler_task(void* p_argument)
 /* =========================================================================================== */
 /*   PUBLIC FUNCTION                                                                           */
 /* =========================================================================================== */
+/**
+  * @brief      activates scheduler task run
+  * @param      void
+  * @retval     void
+  * @details    This function activates a scheduler run by giving semaphor
+  */
+void run_scheduler(void)
+{
+    xSemaphoreGive(gp_run_scheduler_sem);
+}
 
 /**
   * @brief      init freeRTOS resources related to the scheduler

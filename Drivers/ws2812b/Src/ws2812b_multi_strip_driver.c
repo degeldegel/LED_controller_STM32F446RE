@@ -4,6 +4,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "porting_layer.h"
+#include "scheduler.h"
 
 /* =========================================================================================== */
 /*   PRIVATE DEFINES                                                                           */
@@ -213,8 +214,9 @@ void led_driver_task(void* p_argument)
         }
         else
         {
-            PL_ASSERT();
+//            PL_ASSERT();
         }
+        run_scheduler();
     }
 }
 
@@ -254,10 +256,7 @@ void start_led_driver_run(void)
 {
     BaseType_t pxHigherPriorityTaskWoken;
     PL_ASSERT_COND(xSemaphoreGiveFromISR(gp_run_led_driver_sem, &pxHigherPriorityTaskWoken));
-    if (pxHigherPriorityTaskWoken)
-    {
-        PL_ASSERT();
-    }
+    portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
 }
 
 /**

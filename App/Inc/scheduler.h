@@ -35,6 +35,14 @@
 /*   PUBLIC FUNCTION DECLARATION                                                               */
 /* =========================================================================================== */
 /**
+  * @brief      activates scheduler task run
+  * @param      void
+  * @retval     void
+  * @details    This function activates a scheduler run by giving semaphor
+  */
+void run_scheduler(void);
+
+/**
   * @brief      init freeRTOS resources related to the scheduler
   * @param      void
   * @retval     void

@@ -29,6 +29,13 @@
   * @param  void
   * @retval void
   */
+void pl_start_frame_timer(void);
+
+/**
+  * @brief  This function performs assert handling
+  * @param  void
+  * @retval void
+  */
 void pl_assert_handle(void);
 
 #endif /* INC_PORTING_LAYER_H_ */
