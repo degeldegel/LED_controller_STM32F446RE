@@ -99,6 +99,13 @@ void stars_show_init(uint16_t show_id, show_db_t* show_db);
 
 #define LIST_OF_INIT_FUNCTIONS {snake_show_init, \
 		                        stars_show_init}
+/**
+  * @brief      performs power correction according to max_power configuration
+  * @param      uint16_t    show id
+  * @param      uint8_t*    p_color
+  * @retval     void
+  */
+void perform_power_correction(uint8_t* p_color);
 
 /**
   * @brief      sends queue item to show task

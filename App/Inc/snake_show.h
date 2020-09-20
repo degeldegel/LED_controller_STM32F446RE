@@ -26,7 +26,7 @@ typedef struct snake_show_config_db
 
 typedef struct snake_show_params_db
 {
-    uint16_t step_cntr;                 /* step counter, advanced by one each step, zeroed every step_size */
+    uint16_t step_cntr;                 /* step counter, advanced by one each step, zeroed every step_size. */
     uint16_t cycle_cntr;                /* cycle counter, advanced by one each step of the snake, zeroed every cycle_length */
     uint8_t  color[MAX_RGB_PER_LED];    /* current color */
 } snake_show_params_db_t;

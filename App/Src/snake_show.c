@@ -21,7 +21,8 @@
 /* =========================================================================================== */
 /*   GLOBAL VARIABLES                                                                          */
 /* =========================================================================================== */
-
+/* Need to find a way to hand shake between Shows mechanism and shows, accessing Global shows struct is not ideal */
+extern show_db_t gp_shows[NUM_OF_SHOW];
 /* =========================================================================================== */
 /*   STATIC VARIABLES                                                                          */
 /* =========================================================================================== */
@@ -32,9 +33,9 @@ snake_show_db_t s_snake_db;
 /* =========================================================================================== */
 void snake_db_init_defaults(void)
 {
-    s_snake_db.config.cycle_length = 8;
-    s_snake_db.config.snake_length = 5;
-    s_snake_db.config.step_size = 10;
+    s_snake_db.config.cycle_length = 10;
+    s_snake_db.config.snake_length = 7;
+    s_snake_db.config.step_size = 2;
 
     s_snake_db.params.step_cntr = 0;
     s_snake_db.params.cycle_cntr = 0;
@@ -69,8 +70,8 @@ void snake_show_set_frame(uint16_t show_id, uint32_t frame_idx, uint8_t frame[MA
         }
         /* update the first led, the only one that wasn't updated till now */
 //        new_led_idx = ((shows[snake_show_id].direction == REGULAR_DIRECTION) || ((shows[snake_show_id].direction == ALTER_DIRECTION) && (strip_id % 2 == 0))) ? 0 : MAX_LEDS_IN_STRIP-1;
-        uint8_t shift = ((s_snake_db.params.cycle_cntr == 0) || (s_snake_db.params.cycle_cntr == (s_snake_db.config.snake_length-1))) ? 2 :
-                        ((s_snake_db.params.cycle_cntr == 1) || (s_snake_db.params.cycle_cntr == (s_snake_db.config.snake_length-2))) ? 1 : 0;
+        uint8_t shift = ((s_snake_db.params.cycle_cntr == 0) || (s_snake_db.params.cycle_cntr == (s_snake_db.config.snake_length-1))) ? 5 :
+                        ((s_snake_db.params.cycle_cntr == 1) || (s_snake_db.params.cycle_cntr == (s_snake_db.config.snake_length-2))) ? 2 : 0;
         uint8_t strip_id;
         for (strip_id = 0; strip_id < MAX_SUPPORTED_NUM_OF_STRIPS; strip_id++)
         {
@@ -87,11 +88,23 @@ void snake_show_set_frame(uint16_t show_id, uint32_t frame_idx, uint8_t frame[MA
                 frame[strip_id][0][RGB_BLUE] = 0;
             }
         }
+        s_snake_db.params.cycle_cntr++;
+        if (s_snake_db.params.cycle_cntr == s_snake_db.config.cycle_length)
+        {
+            s_snake_db.params.cycle_cntr = 0;
+        }
     }
     s_snake_db.params.step_cntr++;
     if (s_snake_db.params.step_cntr == s_snake_db.config.step_size)
     {
-        s_snake_db.params.step_cntr =0;
+        /* Need to find a way to hand shake between Shows mechanism and shows, accessing Global shows struct is not ideal */
+        gp_shows[0].next_frame = NEXT_FRAME_MOVE_FORWARD;
+        s_snake_db.params.step_cntr = 0;
+    }
+    else
+    {
+        /* Need to find a way to hand shake between Shows mechanism and shows, accessing Global shows struct is not ideal */
+        gp_shows[0].next_frame = NEXT_FRAME_NO_CHANGE;
     }
 }
 

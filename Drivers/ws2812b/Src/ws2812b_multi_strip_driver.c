@@ -166,6 +166,7 @@ void update_driver_masks(uint8_t LED_strips[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUP
 			{
 				uint8_t cur_rgb_led;
 				cur_rgb_led = LED_strips[strip_idx][led_idx][rgb_idx];
+				perform_power_correction(&cur_rgb_led);
 				int base_bit_idx = led_idx*BITS_TO_CONFIGURE_ONE_LED + rgb_idx*BITS_IN_BYTE;
 				GPIO_strips_mask[curr_strip_port][base_bit_idx + 0] |= ((cur_rgb_led>>7) & 0x1) ? 0 : curr_strip_gpio_msk;
 				GPIO_strips_mask[curr_strip_port][base_bit_idx + 1] |= ((cur_rgb_led>>6) & 0x1) ? 0 : curr_strip_gpio_msk;

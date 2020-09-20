@@ -36,6 +36,9 @@ QueueHandle_t gp_show_q = NULL;
  * the driver will push the LED strips according to this db */
 uint8_t  gp_frame[MAX_SUPPORTED_NUM_OF_STRIPS][MAX_SUPPORTED_LEDS_IN_STRIP][MAX_RGB_PER_LED] = {0};
 
+/* Power correction multiplier, updated every frame. used in perform_power_correction function
+ * by LED strip update. holds the percentage of max_power out of 1024 e.g. 20% will be 204 */
+static uint32_t s_power_cor_mult = 0;
 /* =========================================================================================== */
 /*   STATIC VARIABLES                                                                          */
 /* =========================================================================================== */
@@ -95,29 +98,20 @@ void prepare_frame(uint16_t show_id)
 }
 
 /**
-  * @brief      performs power correction according to max_power configuration
+  * @brief      prepares power correction multiplier
   * @param      uint16_t    show id
   * @retval     void
+  * @details    calculates power correction multiplier according to max_power configuration
+  *             The correction multiplier is saved for performing the correction during mask
+  *             update in LED driver.
+  *             max_power is a value (0-100) in percent, in order to make the calculation more
+  *             efficient we calculate the multiplier to be the percentage out of 1024.
+  *             This makes the power correction calculation simply multiply by the multiplier and
+  *             shift right 10 bits
   */
-void perform_power_correction(uint16_t show_id)
+void prepare_power_correction(uint16_t show_id)
 {
-    /*TODO - power correction can't happen on the frame as it will mess up users code,
-             it has to be done inside strip update on the go */
-
-//    int32_t led_id, strip_id;
-//    for (strip_id=0; strip_id < MAX_ACTIVE_STRIPS; strip_id++)
-//    {
-//        for (led_id=0; led_id < MAX_LEDS_IN_STRIP; led_id++)
-//        {
-//            uint32_t color, color_idx;
-//            for (color_idx = 0; color_idx < MAX_RGB_PER_LED; color_idx++)
-//            {
-//                color = gp_frame[strip_id][led_id][color_idx];
-//                color = color * gp_shows[show_id].max_power / 100;
-//                gp_frame[strip_id][led_id][color_idx] = (uint8_t)color;
-//            }
-//        }
-//    }
+    s_power_cor_mult = 1024 * (uint32_t)gp_shows[show_id].max_power / 100;
 }
 
 /**
@@ -170,7 +164,7 @@ void shows_task(void* p_argument)
         {
             prepare_frame(show_id);
             gp_shows[show_id].set_frame(show_id, q_item.frame_index, gp_frame);
-            perform_power_correction(show_id);
+            prepare_power_correction(show_id);
             perform_fade_in_out(show_id);
             update_led_strips(gp_frame);
         }
@@ -185,6 +179,19 @@ void shows_task(void* p_argument)
 /* =========================================================================================== */
 /*   PUBLIC FUNCTION                                                                           */
 /* =========================================================================================== */
+/**
+  * @brief      performs power correction according to max_power configuration
+  * @param      uint16_t    show id
+  * @param      uint8_t*    p_color
+  * @retval     void
+  */
+void perform_power_correction(uint8_t* p_color)
+{
+    uint32_t color = (uint32_t)*p_color;
+    color = (color * s_power_cor_mult) >> 10;
+    *p_color = (uint8_t)color;
+}
+
 /**
   * @brief      sends queue item to show task
   * @param      uint16_t    show id that should run
