@@ -146,6 +146,8 @@ void init_shows(void)
             gp_init_show_func[show_idx](show_idx, &gp_shows[show_idx]);
         }
     }
+    update_led_strips(gp_frame);
+    pl_start_frame_timer();
 }
 
 /**

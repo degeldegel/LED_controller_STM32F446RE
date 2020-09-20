@@ -111,7 +111,6 @@ void init_scheduler(void)
 //        schdlr_db.show[show_idx].showId = show_idx;
 //        schdlr_db.show[show_idx].played = SCHDLR_SHOW_DIDNT_PLAY;
 //    }
-    pl_start_frame_timer();
 }
 
 /**

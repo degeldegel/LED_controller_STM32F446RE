@@ -214,7 +214,7 @@ void led_driver_task(void* p_argument)
         }
         else
         {
-//            PL_ASSERT();
+            PL_ASSERT();
         }
         run_scheduler();
     }
@@ -230,9 +230,11 @@ void led_driver_task(void* p_argument)
   */
 void drive_led_strips(void)
 {
-    taskENTER_CRITICAL();
+    //taskENTER_CRITICAL();
+    __disable_irq();
     drive_ws2812b_led_strips_via_gpio_ports();
-    taskEXIT_CRITICAL();
+    __enable_irq();
+    //taskEXIT_CRITICAL();
 }
 
 /**
@@ -285,8 +287,6 @@ void init_led_strips(void)
 
     // enable DWT counter used for timing of the driver
     DWT->CTRL |= 1;
-
-    drive_led_strips();
 }
 
 /**
