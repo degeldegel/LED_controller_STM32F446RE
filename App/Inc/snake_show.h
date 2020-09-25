@@ -35,6 +35,7 @@ typedef struct snake_show_db
 {
     snake_show_config_db_t config;  /* snake configuration */
     snake_show_params_db_t params;  /* snake parameters */
+    show_db_t              show_db; /* snake's show database */
 } snake_show_db_t;
 
 /* =========================================================================================== */

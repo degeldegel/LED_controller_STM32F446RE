@@ -19,14 +19,9 @@
 /* =========================================================================================== */
 
 /* =========================================================================================== */
-/*   GLOBAL VARIABLES                                                                          */
-/* =========================================================================================== */
-/* Need to find a way to hand shake between Shows mechanism and shows, accessing Global shows struct is not ideal */
-extern show_db_t gp_shows[NUM_OF_SHOW];
-/* =========================================================================================== */
 /*   STATIC VARIABLES                                                                          */
 /* =========================================================================================== */
-snake_show_db_t s_snake_db;
+static snake_show_db_t s_snake_db;
 
 /* =========================================================================================== */
 /*   PRIVATE FUNCTION                                                                          */
@@ -98,28 +93,32 @@ void snake_show_set_frame(uint16_t show_id, uint32_t frame_idx, uint8_t frame[MA
     if (s_snake_db.params.step_cntr == s_snake_db.config.step_size)
     {
         /* Need to find a way to hand shake between Shows mechanism and shows, accessing Global shows struct is not ideal */
-        gp_shows[0].next_frame = NEXT_FRAME_MOVE_FORWARD;
+        s_snake_db.show_db.next_frame = NEXT_FRAME_MOVE_FORWARD;
         s_snake_db.params.step_cntr = 0;
     }
     else
     {
         /* Need to find a way to hand shake between Shows mechanism and shows, accessing Global shows struct is not ideal */
-        gp_shows[0].next_frame = NEXT_FRAME_NO_CHANGE;
+        s_snake_db.show_db.next_frame = NEXT_FRAME_NO_CHANGE;
     }
 }
 
 /* =========================================================================================== */
 /*   PUBLIC FUNCTION                                                                           */
 /* =========================================================================================== */
-void snake_show_init(uint16_t show_id, show_db_t* show_db)
+show_db_t* snake_show_init(uint16_t show_id)
 {
-    show_db->show_mode = SHOW_MODE_FRAME_BY_FRAME;
-    show_db->next_frame = NEXT_FRAME_MOVE_FORWARD;
-    show_db->frame_duration = 40;
-    show_db->fade_in_enable = true;
-    show_db->fade_out_enable = true;
-    show_db->max_power = 60;
-    show_db->direction = 0;
-    show_db->set_frame = snake_show_set_frame;
+    /* init snake database configurations and parameters */
     snake_db_init_defaults();
+    /* init snake's show database */
+    s_snake_db.show_db.show_mode = SHOW_MODE_FRAME_BY_FRAME;
+    s_snake_db.show_db.next_frame = NEXT_FRAME_MOVE_FORWARD;
+    s_snake_db.show_db.frame_duration = 40;
+    s_snake_db.show_db.fade_in_enable = true;
+    s_snake_db.show_db.fade_out_enable = true;
+    s_snake_db.show_db.max_power = 60;
+    s_snake_db.show_db.direction = 0;
+    s_snake_db.show_db.set_frame = snake_show_set_frame;
+    /* return pointer to snake's show database */
+    return &s_snake_db.show_db;
 }

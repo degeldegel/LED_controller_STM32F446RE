@@ -65,24 +65,18 @@ typedef struct show_q_item
 } show_q_item_t;
 
 /**
-  * @brief   initialization of show database
-  * @param   uint16_t - show id
-  * @param   show_db_t* - pointer to show database
-  * @retval  void
-  * @details This function will receive a pointer to the show database, and will update it.
-  *          This funciton will be called on initialization of the system
+  * @brief      initialization of a show
+  * @param      uint16_t   - show id
+  * @retval     show_db_t* - pointer to show database
+  * @details    This function will initialize the show
+  *             This function will return a pointer to the show's show database.
+  *             This function will be called on initialization of the system.
   */
-typedef void (*init_show)(uint16_t show_id, show_db_t* show_db);
+typedef show_db_t* (*init_show)(uint16_t show_id);
 
 /* =========================================================================================== */
 /*   MACROS                                                                                    */
 /* =========================================================================================== */
-//#define SET_POWER(show, power) (uint8_t)(((double)(shows[show].max_power)/100)*power)
-
-/* =========================================================================================== */
-/*   PUBLIC FUNCTION DECLARATION                                                               */
-/* =========================================================================================== */
-
 
 /* =========================================================================================== */
 /*   USER SHOWS DEFINITIONS AND DECLARATIONS                                                   */
@@ -94,19 +88,15 @@ typedef enum _show_id
     NUM_OF_SHOW
 } show_id_e;
 
-void snake_show_init(uint16_t show_id, show_db_t* show_db);
-void stars_show_init(uint16_t show_id, show_db_t* show_db);
+show_db_t* snake_show_init(uint16_t show_id);
+show_db_t* stars_show_init(uint16_t show_id);
 
 #define LIST_OF_INIT_FUNCTIONS {snake_show_init, \
 		                        stars_show_init}
-/**
-  * @brief      performs power correction according to max_power configuration
-  * @param      uint16_t    show id
-  * @param      uint8_t*    p_color
-  * @retval     void
-  */
-void perform_power_correction(uint8_t* p_color);
 
+/* =========================================================================================== */
+/*   PUBLIC FUNCTION DECLARATION                                                               */
+/* =========================================================================================== */
 /**
   * @brief      sends queue item to show task
   * @param      uint16_t    show id that should run

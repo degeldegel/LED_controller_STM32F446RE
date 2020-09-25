@@ -26,8 +26,8 @@
 /* =========================================================================================== */
 /*   GLOBAL VARIABLES                                                                          */
 /* =========================================================================================== */
-show_db_t gp_shows[NUM_OF_SHOW] = {0};
-init_show gp_init_show_func[NUM_OF_SHOW] = LIST_OF_INIT_FUNCTIONS;
+show_db_t* gp_shows[NUM_OF_SHOW] = {0};
+init_show  gp_init_show_func[NUM_OF_SHOW] = LIST_OF_INIT_FUNCTIONS;
 
 TaskHandle_t  gp_shows_task_handler = NULL;
 QueueHandle_t gp_show_q = NULL;
@@ -54,7 +54,7 @@ static uint32_t s_power_cor_mult = 0;
   */
 void prepare_frame(uint16_t show_id)
 {
-    switch (gp_shows[show_id].next_frame)
+    switch (gp_shows[show_id]->next_frame)
     {
         case NEXT_FRAME_NO_CHANGE:
         {
@@ -111,7 +111,7 @@ void prepare_frame(uint16_t show_id)
   */
 void prepare_power_correction(uint16_t show_id)
 {
-    s_power_cor_mult = 1024 * (uint32_t)gp_shows[show_id].max_power / 100;
+    s_power_cor_mult = 1024 * (uint32_t)gp_shows[show_id]->max_power / 100;
 }
 
 /**
@@ -137,7 +137,7 @@ void init_shows(void)
     {
         if (gp_init_show_func[show_idx])
         {
-            gp_init_show_func[show_idx](show_idx, &gp_shows[show_idx]);
+            gp_shows[show_idx] = gp_init_show_func[show_idx](show_idx);
         }
     }
     update_led_strips(gp_frame);
@@ -160,10 +160,18 @@ void shows_task(void* p_argument)
     {
         PL_ASSERT_COND(xQueueReceive(gp_show_q, &q_item, portMAX_DELAY));
         show_id = q_item.show_id;
-        if (gp_shows[show_id].show_mode == SHOW_MODE_FRAME_BY_FRAME)
+        /* check that the show db exists */
+        if (gp_shows[show_id] == NULL)
+        {
+            PL_ASSERT();
+            continue;
+        }
+
+        /* run next show frame */
+        if (gp_shows[show_id]->show_mode == SHOW_MODE_FRAME_BY_FRAME)
         {
             prepare_frame(show_id);
-            gp_shows[show_id].set_frame(show_id, q_item.frame_index, gp_frame);
+            gp_shows[show_id]->set_frame(show_id, q_item.frame_index, gp_frame);
             prepare_power_correction(show_id);
             perform_fade_in_out(show_id);
             update_led_strips(gp_frame);
@@ -197,7 +205,7 @@ void perform_power_correction(uint8_t* p_color)
   * @param      uint16_t    show id that should run
   * @param      uint32_t    frame index of next frame to run
   * @retval     void
-  * @details    This funciton receives show id that should run the next frame and frame index
+  * @details    This function receives show id that should run the next frame and frame index
   *             that should run. starts the show task by posting to tasks queue
   */
 void run_show(uint16_t show_id, uint32_t frame_idx)
@@ -207,6 +215,7 @@ void run_show(uint16_t show_id, uint32_t frame_idx)
     q_item.frame_index = frame_idx;
     PL_ASSERT_COND(xQueueSend(gp_show_q, &q_item, 0));
 }
+
 /**
   * @brief      init freeRTOS resources related to the shows
   * @param      void
@@ -245,8 +254,9 @@ void init_shows_tasks(void)
 }
 
 /***********************************TEMP FOR COMPILATION**************************************/
-void stars_show_init(uint16_t show_id, show_db_t* show_db)
+show_db_t star_show_db = {0};
+show_db_t* stars_show_init(uint16_t show_id)
 {
-
+    return &star_show_db;
 }
 

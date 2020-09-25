@@ -44,6 +44,13 @@
 #define LED_DRIVER_TASK_STACK_SIZE       (128)
 #define LED_DRIVER_TASK_PRIO             (configMAX_PRIORITIES - 1)
 
+/**
+  * @brief      performs power correction according to max_power configuration
+  * @param      uint8_t*    p_color
+  * @retval     void
+  */
+void perform_power_correction(uint8_t* p_color);
+
 /* =========================================================================================== */
 /*   GLOBAL VARIABLES                                                                          */
 /* =========================================================================================== */
